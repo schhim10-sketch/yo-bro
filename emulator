@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Mini Android Emulator</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    font-family:Arial;
+}
+
+.phone{
+    width:320px;
+    height:650px;
+    background:#1e1e1e;
+    border-radius:35px;
+    overflow:hidden;
+    border:8px solid #333;
+    position:relative;
+}
+
+.statusbar{
+    height:30px;
+    background:#000;
+    color:white;
+    display:flex;
+    justify-content:space-between;
+    padding:5px 10px;
+    font-size:14px;
+}
+
+.screen{
+    height:calc(100% - 30px);
+    background:url('https://picsum.photos/400/800') center/cover;
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+    padding:20px;
+    gap:20px;
+}
+
+.app{
+    width:60px;
+    text-align:center;
+    color:white;
+    cursor:pointer;
+}
+
+.icon{
+    width:60px;
+    height:60px;
+    border-radius:18px;
+    background:#4caf50;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:28px;
+}
+
+.window{
+    position:absolute;
+    inset:0;
+    background:white;
+    display:none;
+    flex-direction:column;
+}
+
+.topbar{
+    background:#222;
+    color:white;
+    padding:12px;
+}
+
+.content{
+    flex:1;
+    padding:20px;
+}
+
+button{
+    padding:10px;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+    <div class="statusbar">
+        <span>9:41</span>
+        <span>📶 🔋</span>
+    </div>
+
+    <div class="screen">
+
+        <div class="app" onclick="openApp('browser')">
+            <div class="icon">🌐</div>
+            Browser
+        </div>
+
+        <div class="app" onclick="openApp('notes')">
+            <div class="icon">📝</div>
+            Notes
+        </div>
+
+        <div class="app" onclick="openApp('music')">
+            <div class="icon">🎵</div>
+            Music
+        </div>
+
+    </div>
+
+    <div class="window" id="browser">
+        <div class="topbar">
+            Browser
+            <button onclick="closeApp('browser')">Close</button>
+        </div>
+
+        <div class="content">
+            Fake Android browser 💀
+            <br><br>
+            <input type="text" placeholder="Search anything">
+        </div>
+    </div>
+
+    <div class="window" id="notes">
+        <div class="topbar">
+            Notes
+            <button onclick="closeApp('notes')">Close</button>
+        </div>
+
+        <div class="content">
+            <textarea style="width:100%;height:200px;"></textarea>
+        </div>
+    </div>
+
+    <div class="window" id="music">
+        <div class="topbar">
+            Music
+            <button onclick="closeApp('music')">Close</button>
+        </div>
+
+        <div class="content">
+            ▶ Fake music player
+        </div>
+    </div>
+
+</div>
+
+<script>
+function openApp(id){
+    document.getElementById(id).style.display = "flex";
+}
+
+function closeApp(id){
+    document.getElementById(id).style.display = "none";
+}
+</script>
+
+</body>
+</html>
