@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Math Solver</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --card: #1a1a24;
+    --border: #2a2a3a;
+    --accent: #7c5cfc;
+    --accent2: #fc5c7d;
+    --text: #e8e8f0;
+    --muted: #6b6b80;
+    --green: #5cfca0;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,92,252,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 30% at 80% 80%, rgba(252,92,125,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 16px 40px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 28px 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(124,92,252,0.4);
+  }
+
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+
+  h1 span {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 1px; }
+
+  .input-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .input-label {
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 100px;
+  }
+
+  textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,252,0.15); }
+  textarea::placeholder { color: var(--muted); }
+
+  .input-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+  .btn-solve {
+    flex: 1;
+    background: linear-gradient(135deg, var(--accent), #9b7dff);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(124,92,252,0.35);
+  }
+
+  .btn-solve:active { transform: scale(0.97); opacity: 0.9; }
+  .btn-solve:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-clear {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 14px 18px;
+    cursor: pointer;
+  }
+
+  .mode-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+
+  .chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .chip.active { background: rgba(124,92,252,0.15); border-color: var(--accent); color: var(--accent); }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    display: none;
+    animation: slideUp 0.3s ease;
+  }
+
+  .result-card.visible { display: block; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(124,92,252,0.06);
+  }
+
+  .result-label { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--green); letter-spacing: 1px; text-transform: uppercase; }
+
+  .copy-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .result-body {
+    padding: 18px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 32px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+
+  .loading.visible { display: flex; }
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); text-align: center; }
+  .loading-text strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 4px; }
+
+  .history-section { margin-top: 20px; }
+  .section-title { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+
+  .history-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .history-q { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .history-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+
+  .error-msg {
+    background: rgba(252,92,125,0.1);
+    border: 1px solid rgba(252,92,125,0.3);
+    border-radius: 12px;
+    color: var(--accent2);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 14px;
+    display: none;
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+
+  .error-msg.visible { display: block; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header>
+    <div class="logo-icon">∑</div>
+    <div>
+      <h1><span>Math</span> Solver</h1>
+      <div class="subtitle">// powered by claude ai</div>
+    </div>
+  </header>
+
+  <div class="mode-row">
+    <div class="chip active" data-mode="solve">Step-by-step</div>
+    <div class="chip" data-mode="answer">Just the answer</div>
+    <div class="chip" data-mode="explain">Explain concept</div>
+    <div class="chip" data-mode="check">Check my work</div>
+  </div>
+
+  <div class="input-card">
+    <span class="input-label">// paste your problem</span>
+    <textarea id="problem" placeholder="e.g. Solve for x: 3x² - 12x + 9 = 0&#10;&#10;or paste the full DeltaMath question here..." rows="4"></textarea>
+    <div class="input-actions">
+      <button class="btn-solve" id="solveBtn" onclick="solve()">Solve It →</button>
+      <button class="btn-clear" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text"><strong>Solving...</strong>crunching the numbers</div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <span class="result-label">✓ solution</span>
+      <button class="copy-btn" onclick="copyResult()">copy</button>
+    </div>
+    <div class="result-body" id="resultBody"></div>
+  </div>
+
+  <div class="history-section" id="historySection" style="display:none">
+    <div class="section-title">// recent problems</div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script>
+  let currentMode = 'solve';
+  let history = JSON.parse(localStorage.getItem('mathHistory') || '[]');
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      currentMode = chip.dataset.mode;
+    });
+  });
+
+  function getSystemPrompt(mode) {
+    const base = `You are an expert math tutor helping a student with their math homework. Be thorough, accurate, and educational.`;
+    return {
+      solve: `${base} Solve the problem step-by-step. Show ALL work clearly. Label each step. Box or clearly state the final answer at the end. Use plain text math notation (no LaTeX).`,
+      answer: `${base} Give ONLY the final answer with a one-line explanation. Be concise. No long working.`,
+      explain: `${base} Explain the math concept or formula involved. Give a clear explanation, then show how to apply it to this problem.`,
+      check: `${base} Check if the student's work/answer is correct. If wrong, explain the mistake and show the correct solution.`
+    }[mode];
+  }
+
+  async function solve() {
+    const problem = document.getElementById('problem').value.trim();
+    if (!problem) return;
+
+    const btn = document.getElementById('solveBtn');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const errorMsg = document.getElementById('errorMsg');
+
+    btn.disabled = true;
+    loading.classList.add('visible');
+    resultCard.classList.remove('visible');
+    errorMsg.classList.remove('visible');
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: getSystemPrompt(currentMode),
+          messages: [{ role: 'user', content: problem }]
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || 'API error');
+
+      const result = data.content.map(b => b.text || '').join('');
+      document.getElementById('resultBody').textContent = result;
+      resultCard.classList.add('visible');
+
+      history.unshift({ q: problem, a: result, mode: currentMode });
+      if (history.length > 10) history.pop();
+      localStorage.setItem('mathHistory', JSON.stringify(history));
+      renderHistory();
+
+    } catch (err) {
+      errorMsg.textContent = '⚠ ' + (err.message || 'Something went wrong. Try again.');
+      errorMsg.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      loading.classList.remove('visible');
+    }
+  }
+
+  function clearAll() {
+    document.getElementById('problem').value = '';
+    document.getElementById('resultCard').classList.remove('visible');
+    document.getElementById('errorMsg').classList.remove('visible');
+  }
+
+  function copyResult() {
+    const text = document.getElementById('resultBody').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'copied!';
+      setTimeout(() => btn.textContent = 'copy', 1500);
+    });
+  }
+
+  function renderHistory() {
+    const section = document.getElementById('historySection');
+    const list = document.getElementById('historyList');
+    if (history.length === 0) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    list.innerHTML = history.slice(0, 5).map((item, i) => `
+      <div class="history-item" onclick="loadHistory(${i})">
+        <div class="history-q">${escapeHtml(item.q)}</div>
+        <div class="history-arrow">›</div>
+      </div>
+    `).join('');
+  }
+
+  function loadHistory(i) {
+    const item = history[i];
+    document.getElementById('problem').value = item.q;
+    document.getElementById('resultBody').textContent = item.a;
+    document.getElementById('resultCard').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0, 60) + (str.length > 60 ? '…' : '');
+  }
+
+  document.getElementById('problem').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.metaKey) solve();
+  });
+
+  renderHistory();
+</script>
+</body>
+</html>
