@@ -1,168 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Mini Android Emulator</title>
-
-<style>
-body{
-    margin:0;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    font-family:Arial;
-}
-
-.phone{
-    width:320px;
-    height:650px;
-    background:#1e1e1e;
-    border-radius:35px;
-    overflow:hidden;
-    border:8px solid #333;
-    position:relative;
-}
-
-.statusbar{
-    height:30px;
-    background:#000;
-    color:white;
-    display:flex;
-    justify-content:space-between;
-    padding:5px 10px;
-    font-size:14px;
-}
-
-.screen{
-    height:calc(100% - 30px);
-    background:url('https://picsum.photos/400/800') center/cover;
-    display:flex;
-    flex-wrap:wrap;
-    align-content:flex-start;
-    padding:20px;
-    gap:20px;
-}
-
-.app{
-    width:60px;
-    text-align:center;
-    color:white;
-    cursor:pointer;
-}
-
-.icon{
-    width:60px;
-    height:60px;
-    border-radius:18px;
-    background:#4caf50;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:28px;
-}
-
-.window{
-    position:absolute;
-    inset:0;
-    background:white;
-    display:none;
-    flex-direction:column;
-}
-
-.topbar{
-    background:#222;
-    color:white;
-    padding:12px;
-}
-
-.content{
-    flex:1;
-    padding:20px;
-}
-
-button{
-    padding:10px;
-    margin-top:10px;
-}
-</style>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Auto Window Opener</title>
+   <style>
+       body {
+           font-family: Arial, sans-serif;
+           text-align: center;
+           padding-top: 50px;
+           background-color: #f4f4f9;
+       }
+       button {
+           padding: 15px 30px;
+           font-size: 18px;
+           cursor: pointer;
+           background-color: #007BFF;
+           color: white;
+           border: none;
+           border-radius: 5px;
+           margin: 10px;
+       }
+       button:hover {
+           background-color: #0056b3;
+       }
+       input {
+           padding: 10px;
+           font-size: 16px;
+           border: 1px solid #ddd;
+           border-radius: 5px;
+           width: 150px;
+       }
+       label {
+           font-size: 16px;
+           margin-right: 10px;
+       }
+       div {
+           margin: 20px 0;
+       }
+       p {
+           color: #666;
+           margin-top: 20px;
+       }
+   </style>
 </head>
-
 <body>
 
-<div class="phone">
+   <h1>Automated Launcher</h1>
+   <div>
+       <label for="count">How many to open:</label>
+       <input type="number" id="count" placeholder="Enter number" value="5" min="1">
+   </div>
+   <div style="margin-top: 20px;">
+       <button onclick="openTabs()">Open as Tabs</button>
+       <button onclick="openWindows()">Open as Windows</button>
+   </div>
+   <p>Note: If windows do not open, check your browser bar for a blocked popup notification and allow them.</p>
 
-    <div class="statusbar">
-        <span>9:41</span>
-        <span>📶 🔋</span>
-    </div>
+   <script>
+       function getCount() {
+           const count = parseInt(document.getElementById('count').value);
+           return isNaN(count) || count < 1 ? 1 : count;
+       }
 
-    <div class="screen">
+       function openTabs() {
+           const count = getCount();
+           for (let i = 0; i < count; i++) {
+               window.open('https://www.google.com', '_blank');
+           }
+       }
 
-        <div class="app" onclick="openApp('browser')">
-            <div class="icon">🌐</div>
-            Browser
-        </div>
-
-        <div class="app" onclick="openApp('notes')">
-            <div class="icon">📝</div>
-            Notes
-        </div>
-
-        <div class="app" onclick="openApp('music')">
-            <div class="icon">🎵</div>
-            Music
-        </div>
-
-    </div>
-
-    <div class="window" id="browser">
-        <div class="topbar">
-            Browser
-            <button onclick="closeApp('browser')">Close</button>
-        </div>
-
-        <div class="content">
-            Fake Android browser 💀
-            <br><br>
-            <input type="text" placeholder="Search anything">
-        </div>
-    </div>
-
-    <div class="window" id="notes">
-        <div class="topbar">
-            Notes
-            <button onclick="closeApp('notes')">Close</button>
-        </div>
-
-        <div class="content">
-            <textarea style="width:100%;height:200px;"></textarea>
-        </div>
-    </div>
-
-    <div class="window" id="music">
-        <div class="topbar">
-            Music
-            <button onclick="closeApp('music')">Close</button>
-        </div>
-
-        <div class="content">
-            ▶ Fake music player
-        </div>
-    </div>
-
-</div>
-
-<script>
-function openApp(id){
-    document.getElementById(id).style.display = "flex";
-}
-
-function closeApp(id){
-    document.getElementById(id).style.display = "none";
-}
-</script>
+       function openWindows() {
+           const count = getCount();
+           for (let i = 0; i < count; i++) {
+               window.open('https://www.google.com', '', 'width=800,height=600');
+           }
+       }
+   </script>
 
 </body>
 </html>
