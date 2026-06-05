@@ -77,5 +77,43 @@
            }
        }
    </script>
+   <!-- Clock Section -->
+<div class="clock-container">
+<div class="time" id="clock">00:00:00 AM</div>
+<!-- Added date element -->
+<div class="date" id="date">Loading Date...</div>
+<div class="label">Boston Time</div>
+</div>
+
+
+<!-- Inline Clock Script -->
+<script>
+function updateClock() {
+const now = new Date();
+// Time configuration
+const timeOptions = {
+timeZone: 'America/New_York',
+hour: '2-digit',
+minute: '2-digit',
+second: '2-digit',
+hour12: true
+};
+// New date configuration
+const dateOptions = {
+timeZone: 'America/New_York',
+weekday: 'long',
+year: 'numeric',
+month: 'long',
+day: 'numeric'
+};
+// Update both elements
+document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', timeOptions);
+document.getElementById('date').textContent = now.toLocaleDateString('en-US', dateOptions);
+}
+// Run clock immediately and update every second
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+
 </body>
 </html>
